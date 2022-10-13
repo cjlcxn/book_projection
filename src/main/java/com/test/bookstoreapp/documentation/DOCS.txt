@@ -1,0 +1,9 @@
+RESTful routes
+Format: HTTP method / Routes / action
+
+1       POST        /api/book   - creates a new book
+2       GET         /api/book   - reads whole list of books
+3       GET         /api/book/{id}  - finds and reads 1 book that matches id
+4       PUT         /api/book       - updates an existing book, with id and content from
+                                      request.body
+5       DELETE      /api/book/{id}  - deletes 1 book, that matches the id

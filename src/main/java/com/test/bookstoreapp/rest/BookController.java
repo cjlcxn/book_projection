@@ -24,11 +24,6 @@ public class BookController {
         this.DAOMethods = DAOMethods;
     }
 
-    @GetMapping("/book")
-    public List<Book> getBooks () {
-        return DAOMethods.getAllBooks();
-    }
-
     @PostMapping("/book")
     // @RequestBody parses the incoming request body (here is JSON) and saves it as a POJO (help from Jackson)
     public Book createBook(@Valid @RequestBody Book book) {
@@ -39,17 +34,9 @@ public class BookController {
         return book;
     }
 
-    @DeleteMapping("/book/{bookId}")
-    public String deleteBook(@PathVariable int bookId) {
-        Book book = DAOMethods.findBookById(bookId);
-
-        // throw custom error, if no query match
-        if (book == null) {
-            throw new BookInvalidIdExc("Id not found - " + bookId);
-        } else {
-            DAOMethods.deleteBook(bookId);
-            return "Book deleted - " + bookId;
-        }
+    @GetMapping("/book")
+    public List<Book> getBooks () {
+        return DAOMethods.getAllBooks();
     }
 
     @GetMapping("/book/{bookId}")
@@ -68,5 +55,18 @@ public class BookController {
     public Book updateBook(@Valid @RequestBody Book book) {
         DAOMethods.saveOrUpdateBook(book);
         return book;
+    }
+
+    @DeleteMapping("/book/{bookId}")
+    public String deleteBook(@PathVariable int bookId) {
+        Book book = DAOMethods.findBookById(bookId);
+
+        // throw custom error, if no query match
+        if (book == null) {
+            throw new BookInvalidIdExc("Id not found - " + bookId);
+        } else {
+            DAOMethods.deleteBook(bookId);
+            return "Book deleted - " + bookId;
+        }
     }
 }

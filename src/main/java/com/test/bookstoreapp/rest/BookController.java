@@ -3,12 +3,15 @@ package com.test.bookstoreapp.rest;
 import com.test.bookstoreapp.dao.DAOInterface;
 import com.test.bookstoreapp.entity.Book;
 import com.test.bookstoreapp.exception.BookInvalidIdExc;
+import com.test.bookstoreapp.rest.hateaosEntity.BookModelAssembler;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.annotation.Validated;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
 
 // main controller for "/book"
@@ -16,12 +19,15 @@ import java.util.List;
 @RequestMapping("/api")
 public class BookController {
 
-    private DAOInterface DAOMethods;
+    private final DAOInterface DAOMethods;
+    private final BookModelAssembler assembler;
 
     // DI for DAO to be used within controller
+    // DI for entityModelAssembler
     @Autowired
-    public BookController(DAOInterface DAOMethods) {
+    public BookController(DAOInterface DAOMethods, BookModelAssembler assembler) {
         this.DAOMethods = DAOMethods;
+        this.assembler = assembler;
     }
 
     @PostMapping("/book")
@@ -35,26 +41,35 @@ public class BookController {
     }
 
     @GetMapping("/book")
-    public List<Book> getBooks () {
-        return DAOMethods.getAllBooks();
+    public CollectionModel<EntityModel<Book>> getBooks () {
+        List<Book> books = DAOMethods.getAllBooks();
+
+        // creating an ArrayList of EntityModels, with each Book transformed with assembler
+        List<EntityModel<Book>> booksWithRef = new ArrayList<>();
+                for(Book book:books) {
+                    booksWithRef.add(assembler.toModel(book));
+                }
+
+        return CollectionModel.of(booksWithRef,
+                linkTo(methodOn(BookController.class).getBooks()).withSelfRel());
     }
 
     @GetMapping("/book/{bookId}")
-    public Book findBookById(@PathVariable int bookId) {
+    public EntityModel<Book> getBookById(@PathVariable int bookId) {
         Book book = DAOMethods.findBookById(bookId);
 
         // throw custom error, if no query match
         if (book == null) {
             throw new BookInvalidIdExc("Id not found - " + bookId);
         } else {
-            return book;
+            return assembler.toModel(book);
         }
     }
 
     @PutMapping("/book")
-    public Book updateBook(@Valid @RequestBody Book book) {
+    public EntityModel<Book> updateBook(@Valid @RequestBody Book book) {
         DAOMethods.saveOrUpdateBook(book);
-        return book;
+        return assembler.toModel(book);
     }
 
     @DeleteMapping("/book/{bookId}")

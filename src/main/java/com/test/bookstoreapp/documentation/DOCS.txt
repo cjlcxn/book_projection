@@ -9,10 +9,13 @@ Format: HTTP method / Routes / action
 5       DELETE      /api/book/{id}  - deletes 1 book, that matches the id
 
 
-Database
+Database:
 JPA + Hibernate --> MySQL
 
+
+
 Seeding script for MySQL:
+
 CREATE DATABASE `book_directory`;
 USE `book_directory`;
 

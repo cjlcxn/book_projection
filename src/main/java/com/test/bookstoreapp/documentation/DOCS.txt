@@ -7,3 +7,31 @@ Format: HTTP method / Routes / action
 4       PUT         /api/book       - updates an existing book, with id and content from
                                       request.body
 5       DELETE      /api/book/{id}  - deletes 1 book, that matches the id
+
+
+Database
+JPA + Hibernate --> MySQL
+
+Seeding script for MySQL:
+CREATE DATABASE `book_directory`;
+USE `book_directory`;
+
+DROP TABLE IF EXISTS `book`;
+
+CREATE TABLE `book` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `title` varchar(45) DEFAULT NULL,
+  `genre` varchar(45) DEFAULT NULL,
+  `publisher` varchar(45) DEFAULT NULL,
+  `author` varchar(45) DEFAULT NULL,
+  `price` decimal(15, 2) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
+
+INSERT INTO `book` VALUES
+	(1,'Harry Potter and the Chamber of Secrets','Fantasy','Bloomsbury', 'JK Rowling', 59.00),
+    (2,'How to Do It Right','Motivational','Penguin', 'James Bennedict', 49.00),
+	(3,'Life is Pain','Fiction','Macmillan', 'Tiger JK', 59.00),
+	(4,'World War Z','Horror','Crown', 'Max Brooks', 39.00),
+	(5,'Jump','Motivational','HarperCollins', 'Steve Harvey', 70.99);
+

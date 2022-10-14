@@ -68,6 +68,9 @@ public class BookController {
 
     @PutMapping("/book")
     public EntityModel<Book> updateBook(@Valid @RequestBody Book book) {
+        // handle error for no ID inputs, as it will trigger save instead of update
+        if(book.getId() == 0) throw new BookInvalidIdExc("Id field should not be 0 or empty");
+
         DAOMethods.saveOrUpdateBook(book);
         return assembler.toModel(book);
     }

@@ -3,6 +3,7 @@ package com.test.bookstoreapp.dao;
 import com.test.bookstoreapp.entity.Book;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 

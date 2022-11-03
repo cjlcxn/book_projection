@@ -5,6 +5,7 @@ import com.test.bookstoreapp.entity.Book;
 import com.test.bookstoreapp.exception.BookInvalidIdExc;
 import com.test.bookstoreapp.rest.hateaosEntity.BookModelAssembler;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
@@ -13,6 +14,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 
 // main controller for "/book"
 @RestController
@@ -33,16 +36,13 @@ public class BookController {
     @PostMapping("/book")
     // @RequestBody parses the incoming request body (here is JSON) and saves it as a POJO (help from Jackson)
     public Book createBook(@Valid @RequestBody Book book) {
-        // id set to 0, so Hibernate will save instead of update later in session.saveOrUpdate
-        book.setId(0);
-
-        DAOMethods.saveOrUpdateBook(book);
+        DAOMethods.save(book);
         return book;
     }
 
     @GetMapping("/book")
     public CollectionModel<EntityModel<Book>> getBooks () {
-        List<Book> books = DAOMethods.getAllBooks();
+        List<Book> books = DAOMethods.findAll();
 
         // creating an ArrayList of EntityModels, with each Book transformed with assembler
         List<EntityModel<Book>> booksWithRef = new ArrayList<>();
@@ -53,38 +53,48 @@ public class BookController {
         return CollectionModel.of(booksWithRef,
                 linkTo(methodOn(BookController.class).getBooks()).withSelfRel());
     }
-
+//
     @GetMapping("/book/{bookId}")
     public EntityModel<Book> getBookById(@PathVariable int bookId) {
-        Book book = DAOMethods.findBookById(bookId);
+        try {
+            Optional<Book> book = DAOMethods.findById(bookId);
+            Book bookRetrieved = book.get();
 
-        // throw custom error, if no query match
-        if (book == null) {
+            // throw custom error, if no query match
+                return assembler.toModel(bookRetrieved);
+
+
+        } catch (NoSuchElementException e) {
+            System.out.println("Error is here:" + e.getMessage());
             throw new BookInvalidIdExc("Id not found - " + bookId);
-        } else {
-            return assembler.toModel(book);
         }
     }
-
+//
     @PutMapping("/book")
     public EntityModel<Book> updateBook(@Valid @RequestBody Book book) {
         // handle error for no ID inputs, as it will trigger save instead of update
         if(book.getId() == 0) throw new BookInvalidIdExc("Id field should not be 0 or empty");
 
-        DAOMethods.saveOrUpdateBook(book);
+        DAOMethods.save(book);
         return assembler.toModel(book);
     }
-
+//
     @DeleteMapping("/book/{bookId}")
     public String deleteBook(@PathVariable int bookId) {
-        Book book = DAOMethods.findBookById(bookId);
 
-        // throw custom error, if no query match
-        if (book == null) {
-            throw new BookInvalidIdExc("Id not found - " + bookId);
-        } else {
-            DAOMethods.deleteBook(bookId);
-            return "Book deleted - " + bookId;
+        try {
+            DAOMethods.deleteById(bookId);
+        }catch (EmptyResultDataAccessException e) {
+            System.out.println(e.getMessage());
+            throw e;
         }
+        // throw custom error, if no query match
+//        if (book == null) {
+//            throw new BookInvalidIdExc("Id not found - " + bookId);
+//        } else {
+//            DAOMethods.deleteBook(bookId);
+//
+//        }
+        return "Book deleted - " + bookId;
     }
 }

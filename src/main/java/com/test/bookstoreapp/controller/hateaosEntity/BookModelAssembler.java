@@ -1,9 +1,8 @@
-package com.test.bookstoreapp.rest.hateaosEntity;
+package com.test.bookstoreapp.controller.hateaosEntity;
 
 import com.test.bookstoreapp.entity.Book;
-import com.test.bookstoreapp.rest.BookController;
+import com.test.bookstoreapp.controller.BookController;
 import org.springframework.hateoas.EntityModel;
-import org.springframework.hateoas.RepresentationModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
 import org.springframework.stereotype.Component;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;

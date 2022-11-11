@@ -5,6 +5,7 @@ package com.test.bookstoreapp.entity;
 import jdk.jfr.Enabled;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 
@@ -21,33 +22,30 @@ public class Book {
 
     @Column(name = "title")
     @NotNull
+    @NotBlank(message = "Title is required")
     private String title;
-
-    @Column(name = "genre")
-    @NotNull
-    private String genre;
 
     @Column(name = "publisher")
     @NotNull
+    @NotBlank(message = "Publisher is required")
     private String publisher;
-
-    @Column(name = "author")
-    @NotNull
-    private String author;
 
     @Column(name = "price")
     @NotNull
     private BigDecimal price;
 
+    @ManyToOne (cascade = CascadeType.ALL)
+    @JoinColumn(name = "genre_id", foreignKey = @ForeignKey(name = "FK_genre"))
+    private Genre genre;
+
     // no arg constructor required, for Hibernate to create a bean based on this class
     public Book() {
     }
 
-    public Book(String title, String genre, String publisher, String author, BigDecimal price) {
+    public Book(String title, Genre genre, String publisher, BigDecimal price) {
         this.title = title;
         this.genre = genre;
         this.publisher = publisher;
-        this.author = author;
         this.price = price;
     }
 
@@ -67,11 +65,11 @@ public class Book {
         this.title = title;
     }
 
-    public String getGenre() {
+    public Genre getGenre() {
         return genre;
     }
 
-    public void setGenre(String genre) {
+    public void setGenre(Genre genre) {
         this.genre = genre;
     }
 
@@ -81,14 +79,6 @@ public class Book {
 
     public void setPublisher(String publisher) {
         this.publisher = publisher;
-    }
-
-    public String getAuthor() {
-        return author;
-    }
-
-    public void setAuthor(String author) {
-        this.author = author;
     }
 
     public BigDecimal getPrice() {
@@ -106,7 +96,6 @@ public class Book {
                 ", title='" + title + '\'' +
                 ", genre='" + genre + '\'' +
                 ", publisher='" + publisher + '\'' +
-                ", author='" + author + '\'' +
                 ", price=" + price +
                 '}';
     }

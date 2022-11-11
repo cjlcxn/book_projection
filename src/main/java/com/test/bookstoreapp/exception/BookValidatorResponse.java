@@ -5,19 +5,21 @@ import org.springframework.validation.FieldError;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BookErrorResponse {
-
+public class BookValidatorResponse {
     private int status;
     private String message;
     private long timeStamp;
+    private List<FieldError> fieldErrors;
 
-    public BookErrorResponse() {
+    public BookValidatorResponse() {
+        this.fieldErrors = new ArrayList<>();
     }
 
-    public BookErrorResponse(int status, String message, long timeStamp) {
+    public BookValidatorResponse(int status, String message, long timeStamp) {
         this.status = status;
         this.message = message;
         this.timeStamp = timeStamp;
+
     }
 
     public int getStatus() {
@@ -44,4 +46,12 @@ public class BookErrorResponse {
         this.timeStamp = timeStamp;
     }
 
+    public List<FieldError> getFieldErrors() {
+        return fieldErrors;
+    }
+
+    public void addFieldError(String path, String message) {
+        FieldError error = new FieldError("Book", path, message);
+        fieldErrors.add(error);
+    }
 }
